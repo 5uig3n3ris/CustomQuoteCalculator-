@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Quote Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8fafc;
+      color: #1f2937;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .quote-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e7eb;
+    }
+
+    h2 {
+      color: #4f46e5;
+      margin-bottom: 1.5rem;
+    }
+
+    .section {
+      margin-bottom: 1.5rem;
+    }
+
+    .accordion {
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .accordion-header {
+      background-color: #f1f5f9;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .accordion-body {
+      display: none;
+      padding: 1rem;
+      background-color: #fff;
+    }
+
+    .feature {
+      margin-bottom: 0.75rem;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+    }
+
+    .description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-left: 1.5rem;
+      margin-top: -0.25rem;
+    }
+
+    .tooltip {
+      display: inline-block;
+      position: relative;
+      cursor: help;
+      color: #4f46e5;
+    }
+
+    .tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #1f2937;
+      color: white;
+      padding: 0.4rem 0.6rem;
+      border-radius: 0.4rem;
+      font-size: 0.75rem;
+      white-space: pre-wrap;
+      z-index: 10;
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+
+    .quote-result {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #eef2ff;
+      border-left: 4px solid #4f46e5;
+      border-radius: 0.5rem;
+    }
+
+    .btn-download {
+      background-color: #10b981;
+      margin-left: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="quote-card">
+    <h2>Interactive Service Quote Calculator</h2>
+    <div class="section" id="calculator-container"></div>
+    <button onclick="calculateTotal()">Calculate Total</button>
+    <button class="btn-download" onclick="downloadQuote()">Download PDF</button>
+    <div id="quote-result" class="quote-result" style="display:none;"></div>
+  </div>
+
+  <script>
+    const services = [
+      {
+        category: "🧠 AI & Web App Development",
+        features: [
+          { label: "Custom AI Tools ($500+)", value: 500, tooltip: "GPT tools, blog editors, educational AI integrations" },
+          { label: "Client-Side Web App ($300+)", value: 300, tooltip: "News widgets, flashcards, calculators with no backend" }
+        ]
+      },
+      {
+        category: "📚 English Learning Platform Support",
+        features: [
+          { label: "Full Platform Setup ($250+)", value: 250, tooltip: "Payments, course structure, dashboard and integrations" }
+        ]
+      },
+      {
+        category: "💼 Hosting & Web Services",
+        features: [
+          { label: "Hosting Setup & Automation ($200+)", value: 200, tooltip: "WHMCS, domain reselling, client panel setup" }
+        ]
+      },
+      {
+        category: "📊 Custom Projects & Dashboards",
+        features: [
+          { label: "Data Dashboards ($400+)", value: 400, tooltip: "Student analytics, spending reports, performance insights" }
+        ]
+      },
+      {
+        category: "📦 Add-ons & Styling",
+        features: [
+          { label: "Embeddable Widget ($100)", value: 100, tooltip: "Reusable widget you can embed anywhere" },
+          { label: "Custom Styling & Branding ($75)", value: 75, tooltip: "Theme-matching UI for client brand identity" }
+        ]
+      }
+    ];
+
+    function renderCalculator() {
+      const container = document.getElementById("calculator-container");
+      services.forEach(service => {
+        const section = document.createElement("div");
+        section.className = "accordion";
+
+        const header = document.createElement("div");
+        header.className = "accordion-header";
+        header.textContent = service.category;
+        header.onclick = () => toggleAccordion(header);
+
+        const body = document.createElement("div");
+        body.className = "accordion-body";
+
+        service.features.forEach(feat => {
+          const div = document.createElement("div");
+          div.className = "feature";
+
+          div.innerHTML = `
+            <label>
+              <input type="checkbox" class="quote-item" value="${feat.value}">
+              ${feat.label}
+              <span class="tooltip" data-tooltip="${feat.tooltip}">ⓘ</span>
+            </label>
+          `;
+          body.appendChild(div);
+        });
+
+        section.appendChild(header);
+        section.appendChild(body);
+        container.appendChild(section);
+      });
+    }
+
+    function toggleAccordion(header) {
+      const body = header.nextElementSibling;
+      const isOpen = body.style.display === 'block';
+      document.querySelectorAll('.accordion-body').forEach(b => b.style.display = 'none');
+      body.style.display = isOpen ? 'none' : 'block';
+    }
+
+    function calculateTotal() {
+      const checkboxes = document.querySelectorAll('.quote-item');
+      let total = 0;
+      let breakdown = [];
+
+      checkboxes.forEach(cb => {
+        if (cb.checked) {
+          const label = cb.parentNode.textContent.trim();
+          breakdown.push(`• ${label} ($${cb.value})`);
+          total += parseFloat(cb.value);
+        }
+      });
+
+      // Discount: If AI tools + Dashboards selected
+      const discount = breakdown.some(b => b.includes("AI Tools")) && breakdown.some(b => b.includes("Dashboards")) ? 0.1 : 0;
+      const discountedTotal = discount > 0 ? total * (1 - discount) : total;
+
+      let result = `
+        <strong>Total Estimate: $${discountedTotal.toFixed(2)}</strong><br><br>
+        <em>Selected Services:</em><br>
+        ${breakdown.join('<br>')}
+      `;
+      if (discount > 0) result += `<br><br><strong>Bundle Discount Applied: 10% off</strong>`;
+      result += `<br><br><strong>Next:</strong> <a href="mailto:hello@example.com">Email to Confirm</a>`;
+
+      const resultBox = document.getElementById('quote-result');
+      resultBox.innerHTML = result;
+      resultBox.style.display = 'block';
+    }
+
+    function downloadQuote() {
+      const result = document.getElementById('quote-result');
+      if (result.innerText.trim() === '') return alert('Please calculate your quote first.');
+
+      const blob = new Blob([result.innerText], { type: 'application/pdf' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'quote.txt';
+      link.click();
+    }
+
+    renderCalculator();
+  </script>
+</body>
+</html>
