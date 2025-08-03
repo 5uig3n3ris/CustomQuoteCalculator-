@@ -91,6 +91,6 @@ Simply add a new `category` object or append to the `features` array. No HTML ch
 ## 📬 Contact
 
 Need a custom version or help integrating it into your platform?
-**Email:** `hello@example.com`
-**GitHub:** [YourUsername](https://github.com/YourUsername)
-**Portfolio:** [yourdomain.com](https://yourdomain.com)
+* **Email:** `hello@example.com`
+* **GitHub:** [YourUsername](https://github.com/YourUsername)
+* **Portfolio:** [yourdomain.com](https://yourdomain.com)
